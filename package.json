@@ -3,7 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "description": "India-focused unified employer ATS job sourcing dashboard",
-  "engines": { "node": ">=20" },
-  "scripts": { "dev": "vercel dev", "start": "vercel dev" },
-  "devDependencies": { "vercel": "^39.2.2" }
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev"
+  },
+  "devDependencies": {
+    "vercel": "^39.2.2"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.3.0"
+  }
 }
