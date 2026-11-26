@@ -27,7 +27,8 @@
 <div class="toast" id="toast"></div>
 <script>
 const STORE='talentgrid_v1';let state=loadState();let activePage='jobs';let busy=false;
-function loadState(){try{return JSON.parse(localStorage.getItem(STORE))||{boards:[],jobs:[],saved:[],lastSync:null,results:[]}}catch{return{boards:[],jobs:[],saved:[],lastSync:null,results:[]}}}
+const STARTER_BOARDS=[['Capco','greenhouse','capco'],['WPP','greenhouse','wpp'],['InMobi','greenhouse','inmobi'],['PubMatic','greenhouse','pubmatic'],['Payoneer','greenhouse','payoneer'],['Tide','greenhouse','tide'],['Cohere Health','greenhouse','coherehealth'],['Cognite','greenhouse','cognite'],['Abnormal Security','greenhouse','abnormal'],['6sense','greenhouse','6sense'],['CloudSEK','greenhouse','cloudsek'],['Quince','greenhouse','quince'],['Addepar','greenhouse','addepar'],['Ethos Life','greenhouse','ethoslife'],['G-P','greenhouse','globalizationpartners'],['Zeta Global','greenhouse','zetaglobal'],['Acceldata','lever','acceldata'],['100ms','lever','100ms'],['Razorpay','lever','razorpay'],['Postman','ashby','postman']].map(([company,provider,key])=>({id:'starter_'+provider+'_'+key,company,name:company,provider,key,country:'India',starter:true}));
+function loadState(){try{let s=JSON.parse(localStorage.getItem(STORE));if(!s)s={boards:[],jobs:[],saved:[],lastSync:null,results:[],starterSeeded:false};if(!s.boards?.length&&!s.jobs?.length&&!s.starterSeeded){s.boards=STARTER_BOARDS;s.starterSeeded=true;localStorage.setItem(STORE,JSON.stringify(s));}return s}catch{return{boards:STARTER_BOARDS,jobs:[],saved:[],lastSync:null,results:[],starterSeeded:true}}}
 function persist(){localStorage.setItem(STORE,JSON.stringify(state));renderAll()}
 function uid(){return 'b_'+Math.random().toString(36).slice(2,10)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -57,6 +58,6 @@ window.refreshJobs=refreshJobs;refreshBtn.addEventListener('click',refreshJobs);
 [searchInput,locationFilter,sourceFilter,sortFilter].forEach(el=>el.addEventListener('input',renderJobs));
 function csv(rows){if(!rows.length){toast('No jobs to export');return}const cols=['title','company','location','department','employmentType','source','postedAt','url'];const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const body=[cols.join(','),...rows.map(r=>cols.map(k=>q(r[k])).join(','))].join('\r\n');const blob=new Blob(['\ufeff'+body],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='talentgrid-jobs-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(a.href)}
 exportBtn.addEventListener('click',()=>csv(filteredJobs()));savedExportBtn.addEventListener('click',()=>csv(state.saved));
-renderAll();
+renderAll();if(state.boards.length&&state.jobs.length===0&&!state.lastSync)setTimeout(()=>refreshJobs(),500);
 </script>
 </body></html>
