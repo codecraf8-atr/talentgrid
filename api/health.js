@@ -1,0 +1,1 @@
+module.exports=async(req,res)=>{res.setHeader('Cache-Control','no-store');if(req.method!=='GET')return res.status(405).json({status:'method_not_allowed'});return res.status(200).json({status:'ok',service:'TalentGrid API',checks:{database:'not_provisioned',queue:'not_provisioned',scheduler:'not_provisioned'},timestamp:new Date().toISOString()})};
