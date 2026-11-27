@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vercel dev",
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "test": "node --test tests/*.test.js"
   },
   "devDependencies": {
     "vercel": "^39.2.2"
