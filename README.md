@@ -1,61 +1,99 @@
-# TalentGrid — India Jobs Intelligence
+# TalentGrid
 
-A Vercel-deployable, India-focused employer ATS sourcing dashboard. The browser UI is a dependency-free static app; live ATS fetching runs through a Vercel serverless function in `api/jobs.js`.
+**Hiring intelligence. Prospecting. Relationships.**
 
-## Included connectors
+TalentGrid is an internal staffing business-development intelligence and account-management workspace. Its purpose is to help a staffing business consistently identify, qualify, research, approach, follow up with, and convert companies into staffing clients.
 
-| Provider | Public endpoint support | Company-specific value needed |
-|---|---|---|
-| Greenhouse | Yes | Board token from `boards.greenhouse.io/{token}` |
-| Lever | Yes | Site name from `jobs.lever.co/{site}` |
-| Ashby | Yes | Board name from `jobs.ashbyhq.com/{board}` |
-| SmartRecruiters | Yes | Company identifier |
-| Workday | Public CXS job search endpoint | `tenant|site|wdN`, e.g. `acme|External|wd3` |
-| Recruitee | Public offers endpoint | Company subdomain |
-| Custom JSON | Yes, public HTTPS only | URL returning an array or `{ "jobs": [] }` |
+> **Locked product direction:** TalentGrid is not a job aggregator, ATS, LinkedIn replacement, candidate database, or full CRM. Hiring signals are inputs to company-level prospecting.
 
-Each ATS board must be added by the user. The app does not have a global ATS directory or a universal endpoint that reveals every employer using a provider. Greenhouse, Lever, Ashby, SmartRecruiters and Recruitee public boards generally do not need API credentials. Workday tenant endpoints and custom endpoints may vary or change. Darwinbox, SAP SuccessFactors, Oracle Recruiting, PeopleStrong, Keka and TurboHire are not represented as universal connectors because public job APIs/tenant schemas are not consistent across customers; connect those through a compatible public JSON endpoint where available or add a future tenant-specific adapter.
+## Product journey
 
-## Deploy to Vercel
+**Discover → Qualify → Research → Engage → Convert**
 
-1. Extract the ZIP and push the contents of this folder to a GitHub repository.
-2. In Vercel, choose **Add New → Project** and import the repository.
-3. Framework preset: **Other**. Build command: leave blank. Output directory: `.`.
-4. Deploy. No build step or external API key is required for the included public connectors.
-5. Open the deployment, go to **Company boards**, add the company and its ATS identifier, then select **Refresh jobs**.
+## Locked modules
 
-The serverless function runs at `/api/jobs`. `vercel dev` runs the app locally.
+1. **Opportunity Radar** — company-centric hiring activity, consolidation, deduplication, source evidence, role/location filters and company exclusions.
+2. **Opportunity Intelligence** — transparent prioritisation based on service/role fit, hiring intensity, signal freshness, persistence and source reliability.
+3. **Account & Decision-maker Research** — persistent company context, contact research records and validation links.
+4. **Prospect Brief & Outreach Context** — evidence-grounded account briefs and editable outreach suggestions.
+5. **Prospecting CRM** — account pipeline, contacts, activities, tasks, reminders, nurture, recycling and conversion.
 
-## How to add a board
+## Locked development order
 
-- Greenhouse: if the public career page is `https://boards.greenhouse.io/acme`, enter `acme`.
-- Lever: if `https://jobs.lever.co/acme`, enter `acme`.
-- Ashby: if `https://jobs.ashbyhq.com/acme`, enter `acme`.
-- SmartRecruiters: enter the company identifier used by its public career page.
-- Workday: enter `tenant|site|wdN`, for example `acme|External|wd3`. Confirm the tenant, site and region from the employer's actual career page.
-- Recruitee: if `https://acme.recruitee.com`, enter `acme`.
-- Custom JSON: enter a public HTTPS endpoint returning a JSON array or an object with `jobs`, `results`, or `data` array. It must provide a title and an absolute HTTPS application URL for each job.
+0. Reliability and data foundation.
+1. Company-centric Opportunity Radar.
+2. Opportunity Intelligence.
+3. Prospecting CRM.
+4. Decision-maker research and Prospect Brief.
+5. Feedback and commercial intelligence calibration.
 
-## Current storage model and operational limits
+See [Product Blueprint](docs/PRODUCT_BLUEPRINT.md) and [Roadmap](docs/ROADMAP.md).
 
-- Company boards, fetched jobs and saved jobs are stored in the browser's `localStorage`. They persist in that browser profile, but are not shared across devices/users and are cleared if browser site data is removed.
-- No external database, login system, scheduled background refresh, email alerts, or team collaboration is provisioned. Add a managed database and authentication before multi-user/team rollout.
-- Refresh is user-triggered. The dashboard fetches up to 30 boards per request and at most 500 records per board (provider APIs may return fewer; Workday/SmartRecruiters pagination is currently limited to the first page).
-- Job availability, posting dates, location formats and public endpoint access depend on each employer/ATS. A company board can block requests or change its schema. Errors are reported per board.
-- India is the intended sourcing scope. Set each employer board's country to India when adding it. Some global boards may still expose roles outside India; inspect location before sourcing.
-- Public career pages are not proof that an employer accepts staffing vendors. Confirm vendor empanelment, contract model and hiring status independently.
+## Repository architecture (current implementation)
 
-## Security notes
+- Static browser application: `index.html`.
+- Vercel serverless job-fetch endpoint: `api/jobs.js`.
+- Disabled legacy vault endpoint: `api/vault.js` (returns HTTP 410).
+- Vercel configuration: `vercel.json`.
+- Package configuration: `package.json`.
+- Browser-local storage is currently used for boards, fetched jobs and saved jobs; this is not a shared database.
 
-- Do not enter private API secrets into a custom URL or job description. Custom connector support is for public JSON endpoints only; it does not accept custom authorization headers.
-- The `/api/jobs` route fetches user-supplied public HTTPS URLs for custom connectors. For a public production deployment, add authentication, rate limiting, strict outbound host allowlisting and an approved custom-domain policy before enabling untrusted users. The current version is designed as a private, single-operator workspace.
-- API responses are treated as untrusted data and rendered as escaped text. External job links open in a new tab with `noopener noreferrer`.
+The repository's current implementation is a prototype/early operational dashboard. The locked product blueprint describes the target system and does not imply that every target capability has already been implemented.
+
+## Supported public-board adapters (current API implementation)
+
+| Provider | Identifier / configuration |
+|---|---|
+| Greenhouse | Board token |
+| Lever | Site identifier |
+| Ashby | Board identifier |
+| SmartRecruiters | Company identifier |
+| Recruitee | Company subdomain |
+| Workday | Public Workday career-page URL; tenant/site inferred |
+| Custom JSON | Public HTTPS endpoint returning jobs array or supported wrapper |
+
+The server endpoint also has optional server-side integrations for JobVetta and Job Opportunities API, configured through environment variables. See [API Reference](docs/API_REFERENCE.md).
+
+## Deployment
+
+The application is configured for Vercel. The Vercel project is named `talentgrid`; deployments are linked to this repository.
+
+- Runtime configuration: [vercel.json](vercel.json)
+- Deployment and environment guidance: [Deployment](docs/DEPLOYMENT.md)
+- Operational checklist: [Operations](docs/OPERATIONS.md)
+
+## Documentation
+
+- [Product Blueprint](docs/PRODUCT_BLUEPRINT.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Data Model](docs/DATA_MODEL.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [QA Plan](docs/QA_PLAN.md)
+- [Operations and Security](docs/OPERATIONS.md)
+- [Decision Log](docs/DECISIONS.md)
 
 ## Local development
 
+Requirements: Node.js 20+ and the Vercel CLI (available via the project package).
+
 ```bash
 npm install
+npm run dev
+# or
 npx vercel dev
 ```
 
-Open the local URL printed by Vercel CLI.
+## Current limitations and security
+
+- Data is browser-local and not synchronised across users or devices.
+- No provisioned database, authentication system, scheduled refresh, email automation or team collaboration exists in this repository's current architecture.
+- The fetch endpoint accepts board configuration in a POST body; the custom adapter can request public HTTPS URLs. Public deployment for untrusted users requires additional authentication, rate limiting, outbound allowlisting and abuse controls.
+- Public hiring activity is not proof of a staffing-vendor requirement.
+- The system must retain evidence/source attribution and avoid unsupported claims about employers or contacts.
+- Automated LinkedIn scraping, mass outreach and autonomous agent actions are outside the locked scope.
+
+## Product discipline
+
+Reliability precedes expansion. Every feature must support the locked journey and be backed by functional QA. Do not introduce scope drift without explicit approval and evidence.
