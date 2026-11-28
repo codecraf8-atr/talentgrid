@@ -231,6 +231,7 @@ async function downloadText(page, button) {
     await page.waitForTimeout(250);
     assert.equal(await page.locator('#jobList .job').count(), beforeFailure);
     assert.match(await page.locator('#toast').innerText(), /QA simulated upstream failure/);
+    assert.match(await page.locator('#boardList').innerText(), /Error: QA simulated upstream failure/);
     assert.equal(await page.locator('#refreshBtn').isDisabled(), false);
     await page.unroute('**/api/jobs');
     console.log('PASS refresh failure visibility and existing-feed retention');
