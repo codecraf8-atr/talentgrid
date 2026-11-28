@@ -178,7 +178,11 @@ async function downloadText(page, button) {
     assert.equal(await page.locator('#jobList .job').count(), 1);
     await page.locator('#industryFilter').selectOption('');
     await page.locator('#typeFilter').selectOption('');
-    console.log('PASS search, source, region, industry and combined type filters');
+    const jobsCsv = await downloadText(page, page.locator('#exportBtn'));
+    assert.match(jobsCsv.filename, /talentgrid-jobs-/);
+    assert.match(jobsCsv.content, /Senior Software Engineer/);
+    assert.match(await page.locator('#jobList .job a.jobtitle').first().getAttribute('rel'), /noopener/);
+    console.log('PASS search, source, region, industry, combined filters, main CSV and safe external links');
 
     await page.locator('#jobList .job').first().getByTitle('Save job').click();
     await page.locator('[data-page="saved"]').click();
@@ -243,6 +247,27 @@ async function downloadText(page, button) {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 5);
     assert.equal(overflow, false, 'mobile viewport should not have horizontal page overflow');
     console.log('PASS mobile viewport sanity');
+
+    const emptyContext = await browser.newContext({ acceptDownloads: true });
+    const emptyPage = await emptyContext.newPage();
+    emptyPage.on('pageerror', (error) => errors.push(error.message));
+    emptyPage.on('console', (message) => {
+      if (message.type() === 'error' && !message.text().includes('503 (Service Unavailable)')) {
+        errors.push(message.text());
+      }
+    });
+    await emptyPage.addInitScript(() => {
+      localStorage.setItem('talentgrid_v1', JSON.stringify({
+        boards: [], jobs: [], saved: [], focusCompanies: [], excludedCompanies: [],
+        results: [], lastSync: null, starterSeeded: true,
+      }));
+    });
+    await emptyPage.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 45000 });
+    assert.match(await emptyPage.locator('#jobList').innerText(), /Your job feed is ready/);
+    await emptyPage.locator('#exportBtn').click();
+    assert.equal(await emptyPage.locator('#toast').innerText(), 'No jobs to export');
+    await emptyContext.close();
+    console.log('PASS empty-feed state and empty-export feedback');
 
     assert.deepEqual(errors, [], 'browser page/console errors');
     console.log('PASS no browser JavaScript or console errors');
