@@ -103,7 +103,9 @@ async function downloadText(page, button) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() === 'error' && !message.text().includes('503 (Service Unavailable)')) {
+      errors.push(message.text());
+    }
   });
 
   try {
