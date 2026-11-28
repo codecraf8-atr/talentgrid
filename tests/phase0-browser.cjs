@@ -67,6 +67,24 @@ function seedBrowser(page, jobs = fixtureJobs) {
           country: 'India',
           starter: true,
         },
+        {
+          id: 'starter_lever_razorpay',
+          company: 'Razorpay',
+          name: 'Razorpay',
+          provider: 'lever',
+          key: 'razorpay',
+          country: 'India',
+          starter: true,
+        },
+        {
+          id: 'starter_ashby_postman',
+          company: 'Postman',
+          name: 'Postman',
+          provider: 'ashby',
+          key: 'postman',
+          country: 'India',
+          starter: true,
+        },
       ],
       jobs: rows,
       saved: [],
@@ -132,6 +150,15 @@ async function downloadText(page, button) {
     );
     assert.ok(migratedKeys.includes('abnormalsecurity'));
     assert.ok(migratedKeys.includes('addepar1'));
+    const migratedBoards = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('talentgrid_v1')).boards
+    );
+    const razorpay = migratedBoards.find((board) => board.id === 'starter_lever_razorpay');
+    const postman = migratedBoards.find((board) => board.id === 'starter_ashby_postman');
+    assert.equal(razorpay.provider, 'greenhouse');
+    assert.equal(razorpay.key, 'razorpaysoftwareprivatelimited');
+    assert.equal(postman.provider, 'workday');
+    assert.equal(postman.key, 'https://postman.wd108.myworkdayjobs.com/careers');
     const recruiteeOptions = await page.locator('#sourceFilter option').evaluateAll((options) =>
       options.filter((option) => option.value === 'recruitee').length
     );
