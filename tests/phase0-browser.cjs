@@ -50,7 +50,7 @@ const fixtureJobs = [
       location: 'Bengaluru, India',
       department: 'Engineering',
       employmentType: 'Contract',
-      source: 'lever',
+      source: 'greenhouse',
       postedAt: '2026-11-28T00:00:00.000Z',
       url: 'https://example.com/jobs/engineer',
       description: 'Duplicate record with the same source URL',
