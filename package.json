@@ -8,10 +8,14 @@
   },
   "scripts": {
     "dev": "vercel dev",
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "test:api": "node --test tests/phase0-api.test.cjs",
+    "test:browser": "node tests/phase0-browser.cjs",
+    "test": "npm run test:api && npm run test:browser"
   },
   "devDependencies": {
-    "vercel": "^39.2.2"
+    "vercel": "^39.2.2",
+    "playwright": "^1.65.1"
   },
   "dependencies": {
     "@vercel/blob": "^2.3.0"
