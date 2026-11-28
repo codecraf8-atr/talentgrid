@@ -42,6 +42,20 @@ const fixtureJobs = [
     url: 'https://example.com/jobs/sales',
     description: 'Sales role',
   },
+  {
+    ...{
+      id: 'phase0-example-1-duplicate',
+      title: 'Senior Software Engineer (duplicate source row)',
+      company: 'ExampleCo',
+      location: 'Bengaluru, India',
+      department: 'Engineering',
+      employmentType: 'Contract',
+      source: 'lever',
+      postedAt: '2026-11-28T00:00:00.000Z',
+      url: 'https://example.com/jobs/engineer',
+      description: 'Duplicate record with the same source URL',
+    },
+  },
 ];
 
 function seedBrowser(page, jobs = fixtureJobs) {
@@ -133,6 +147,9 @@ async function downloadText(page, button) {
     assert.match(await page.title(), /TalentGrid/);
     assert.equal(await page.locator('.nav button').count(), 5);
     assert.equal(await page.locator('#jobList .job').count(), 3);
+    assert.equal(await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('talentgrid_v1')).jobs.length
+    ), 3, 'persisted duplicate URL rows should be deduplicated during migration');
     for (const [key, crumb] of [
       ['intelligence', 'In Focus'],
       ['boards', 'Company boards'],
