@@ -166,7 +166,7 @@ async function downloadText(page, button) {
     console.log('PASS legacy starter-board migration and duplicate filter-option check');
 
     await page.locator('[data-page="boards"]').click();
-    assert.equal(await page.locator('#boardList .board').count(), 2);
+    assert.equal(await page.locator('#boardList .board').count(), 4);
     await page.locator('#page-boards .pagehead button').click();
     await page.locator('#companyName').fill('Phase0 CRUD Employer');
     await page.locator('#provider').selectOption('greenhouse');
@@ -183,10 +183,10 @@ async function downloadText(page, button) {
     assert.equal(await card.count(), 1);
     page.once('dialog', (dialog) => dialog.accept());
     await card.getByTitle('Remove').click();
-    assert.equal(await page.locator('#boardList .board').count(), 2);
+    assert.equal(await page.locator('#boardList .board').count(), 4);
     await page.reload({ waitUntil: 'networkidle' });
     await page.locator('[data-page="boards"]').click();
-    assert.equal(await page.locator('#boardList .board').count(), 2);
+    assert.equal(await page.locator('#boardList .board').count(), 4);
     assert.equal((await page.locator('#boardList').innerText()).includes('Phase0 CRUD Employer'), false);
     console.log('PASS board create/edit/delete and reload persistence');
 
